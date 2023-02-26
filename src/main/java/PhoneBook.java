@@ -5,6 +5,7 @@ import java.sql.*;
 public class PhoneBook {
     private static String DB_URL = "jdbc:postgresql://localhost:5432/phone_book";
     private static Connection conn;
+
     public static void main(String[] args) {
         PhoneBook phoneBook = new PhoneBook();
 
@@ -116,7 +117,7 @@ public class PhoneBook {
     public void updatePhoneNumber(int id, String phoneNumber) {
         try {
             PreparedStatement updateStatement = conn.prepareStatement(
-                    "update phone_book set phone_number = ? where id = ?"
+                "update phone_book set phone_number = ? where id = ?"
             );
 
             updateStatement.setString(1, phoneNumber);
