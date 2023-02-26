@@ -1,3 +1,6 @@
+import com.zaxxer.hikari.HikariDataSource;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.sql.*;
@@ -28,10 +31,17 @@ public class PhoneBook {
 
     public PhoneBook() {
         try {
-            conn = DriverManager.getConnection(DB_URL);
+            DataSource dataSource = createDataSource();
+            conn = dataSource.getConnection();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private DataSource createDataSource() {
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(DB_URL);
+        return dataSource;
     }
 
     public void closeConnection() {
