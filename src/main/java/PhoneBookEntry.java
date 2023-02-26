@@ -4,19 +4,20 @@ public class PhoneBookEntry {
     public String phoneNumber;
     public String firstName;
     public String lastName;
-    public LocalDate birthDate;
+    public LocalDate birthdate;
     public LocalDate dateAdded;
 
     public PhoneBookEntry(
         String phoneNumber,
         String firstName,
         String lastName,
-        LocalDate birthDate
+        LocalDate birthdate,
+        LocalDate dateAdded
     ) {
         this.phoneNumber = phoneNumber;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.birthDate = birthDate;
-        this.dateAdded = LocalDate.now();
+        this.birthdate = birthdate;
+        this.dateAdded = dateAdded;
     }
 }
