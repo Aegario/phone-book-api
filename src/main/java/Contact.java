@@ -1,22 +1,23 @@
 import java.time.LocalDate;
 
-public class PhoneBookEntry {
-    public String phoneNumber;
+public class Contact {
+    public int  id;
     public String firstName;
     public String lastName;
+    public String phoneNumber;
     public LocalDate birthdate;
     public LocalDate dateAdded;
 
-    public PhoneBookEntry(
-        String phoneNumber,
+    public Contact(
         String firstName,
         String lastName,
+        String phoneNumber,
         LocalDate birthdate,
         LocalDate dateAdded
     ) {
-        this.phoneNumber = phoneNumber;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
         this.birthdate = birthdate;
         this.dateAdded = dateAdded;
     }
