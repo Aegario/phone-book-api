@@ -12,13 +12,11 @@ public class Contact {
         String firstName,
         String lastName,
         String phoneNumber,
-        LocalDate birthdate,
-        LocalDate dateAdded
+        LocalDate birthdate
     ) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.birthdate = birthdate;
-        this.dateAdded = dateAdded;
     }
 }

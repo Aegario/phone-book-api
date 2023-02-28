@@ -198,19 +198,22 @@ public class ContactDao {
             ResultSet resultSet = selectStatement.executeQuery();
             resultSet.next();
 
-            String phoneNumber = resultSet.getString("phone_number");
             String firstName = resultSet.getString("first_name");
             String lastName = resultSet.getString("last_name");
+            String phoneNumber = resultSet.getString("phone_number");
             LocalDate birthdate = resultSet.getDate("birthdate").toLocalDate();
             LocalDate dateAdded = resultSet.getDate("date_added").toLocalDate();
 
-            return new Contact(
-                firstName,
-                lastName,
-                phoneNumber ,
-                birthdate,
-                dateAdded
+            Contact contact = new Contact(
+                    firstName,
+                    lastName,
+                    phoneNumber ,
+                    birthdate
             );
+            contact.id = id;
+            contact.dateAdded = dateAdded;
+
+            return contact;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
