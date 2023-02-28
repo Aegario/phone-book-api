@@ -1,17 +1,14 @@
-import java.time.LocalDate;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+
+import com.sun.net.httpserver.HttpServer;
+import contact.ContactHandler;
 
 public class Main {
-    public static void main(String[] args) {
-        ContactDao contactDao = new ContactDao();
-        Contact contact = new Contact(
-                "Denis",
-
-                "Hormozi",
-                "9991283418",
-                LocalDate.of(2000, 10, 14)
-        );
-        // contactDao.save(contact);
-
-        contactDao.closeConnection();
+    public static void main(String[] args) throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress(80), 0);
+        server.createContext("/", new ContactHandler());
+        server.setExecutor(null);
+        server.start();
     }
 }

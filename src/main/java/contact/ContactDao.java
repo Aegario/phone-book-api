@@ -1,4 +1,7 @@
+package contact;
+
 import com.zaxxer.hikari.HikariDataSource;
+import contact.Contact;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
