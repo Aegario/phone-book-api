@@ -202,7 +202,7 @@ public class ContactDAO {
 
             String firstName = resultSet.getString("first_name");
             String lastName = resultSet.getString("last_name");
-            String phoneNumber = resultSet.getString("phoneNumber");
+            String phoneNumber = resultSet.getString("phone_number");
             LocalDate birthdate = resultSet.getDate("birthdate").toLocalDate();
             LocalDate dateAdded = resultSet.getDate("date_added").toLocalDate();
 

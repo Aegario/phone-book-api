@@ -8,8 +8,13 @@ public class ContactService {
         this.contactDTOMapper = contactDTOMapper;
     }
 
-    public void create(ContactDTO contactDTO) {
+    public void createContact(ContactDTO contactDTO) {
         Contact contact = contactDTOMapper.toContact(contactDTO);
         contactDAO.save(contact);
+    }
+
+    public ContactDTO getContact(int id) {
+        Contact contact = contactDAO.get(id);
+        return contactDTOMapper.toDto(contact);
     }
 }
