@@ -44,10 +44,10 @@ public class ContactDAO {
                 "insert into contact values (default, ?, ?, default, ?, ?)"
             );
 
-            insertStatement.setString(1, contact.firstName);
-            insertStatement.setString(2, contact.lastName);
-            insertStatement.setDate(3, Date.valueOf(contact.birthdate));
-            insertStatement.setString(4, contact.phoneNumber);
+            insertStatement.setString(1, contact.getFirstName());
+            insertStatement.setString(2, contact.getLastName());
+            insertStatement.setDate(3, Date.valueOf(contact.getBirthdate()));
+            insertStatement.setString(4, contact.getPhoneNumber());
 
             int rowsInserted = insertStatement.executeUpdate();
             System.out.println("Number of inserted rows: " + rowsInserted);
@@ -187,7 +187,7 @@ public class ContactDAO {
 
 
     /**
-     * Fetches contact by id
+     * Fetches a contact by id
      * @param id contact's id
      */
     public Contact get(int id) {
@@ -202,7 +202,7 @@ public class ContactDAO {
 
             String firstName = resultSet.getString("first_name");
             String lastName = resultSet.getString("last_name");
-            String phoneNumber = resultSet.getString("phone_number");
+            String phoneNumber = resultSet.getString("phoneNumber");
             LocalDate birthdate = resultSet.getDate("birthdate").toLocalDate();
             LocalDate dateAdded = resultSet.getDate("date_added").toLocalDate();
 
@@ -212,8 +212,8 @@ public class ContactDAO {
                     phoneNumber ,
                     birthdate
             );
-            contact.id = id;
-            contact.dateAdded = dateAdded;
+            contact.setId(id);
+            contact.setDateAdded(dateAdded);
 
             return contact;
         } catch (SQLException e) {
