@@ -1,18 +1,17 @@
 package contact;
 
 import com.zaxxer.hikari.HikariDataSource;
-import contact.Contact;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.sql.*;
 
-public class ContactDao {
+public class ContactDAO {
     private static String DB_URL = "jdbc:postgresql://localhost:5432/phone_book";
     private static Connection conn;
 
-    public ContactDao() {
+    public ContactDAO() {
         try {
             DataSource dataSource = createDataSource();
             conn = dataSource.getConnection();
