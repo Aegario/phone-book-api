@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -30,7 +29,7 @@ public class ContactHandler implements HttpHandler {
                 patchContact(ex);
                 break;
             case "DELETE":
-                deleteContact(ex);
+                deleteContacts(ex);
                 break;
             default:
                 System.out.println("respond with something for the rest of http methods");
@@ -38,20 +37,17 @@ public class ContactHandler implements HttpHandler {
     }
 
     private void getContact(HttpExchange ex) throws IOException {
-        Map<String, String> paramsMap = parseQuery(ex.getRequestURI().getQuery());
+        HashMap<String, String> paramsMap = parseQuery(ex.getRequestURI().getQuery());
         int id = Integer.parseInt(paramsMap.get("id"));
         ContactDTO contactDTO = contactService.getContact(id);
 
-        // writing dto into response body
         // TODO: is it better to stringify an object before converting it to byte stream?
-        ex.sendResponseHeaders(200, 0);
         ObjectMapper mapper = new ObjectMapper();
         byte[] serializedContactDTO = mapper.writeValueAsBytes(contactDTO);
-        // String stringifiedContactDTO = mapper.writeValueAsString(contactDTO);
         OutputStream outputStream = ex.getResponseBody();
+        ex.sendResponseHeaders(200, serializedContactDTO.length);
         outputStream.write(serializedContactDTO);
-        // outputStream.write(stringifiedContactDTO.getBytes());
-        outputStream.close();
+        ex.close();
     }
 
     private void createContact(HttpExchange ex) throws IOException {
@@ -61,28 +57,48 @@ public class ContactHandler implements HttpHandler {
         contactService.createContact(contactDTO);
 
         OutputStream outputStream = ex.getResponseBody();
-        ex.sendResponseHeaders(201, 0);
-        outputStream.close();
+        String successMsg = "Contact has been created.";
+        ex.sendResponseHeaders(201, successMsg.length());
+        outputStream.write(successMsg.getBytes());
+        ex.close();
     }
 
     private void patchContact(HttpExchange ex) throws IOException {
-        InputStream bodyStream = ex.getRequestBody();
-        BufferedReader bufferedBodyReader = new BufferedReader(new InputStreamReader(bodyStream));
-        ContactDTO contactDTO = parseInput(bufferedBodyReader);
+        InputStream inputStream = ex.getRequestBody();
+        BufferedReader bufferedInputReader = new BufferedReader(new InputStreamReader(inputStream));
+        ContactDTO contactDTO = parseInput(bufferedInputReader);
     }
 
-    private void deleteContact(HttpExchange ex) {
-        System.out.println("This is DELETE");
+    private void deleteContacts(HttpExchange ex) throws IOException {
+        InputStream inputStream = ex.getRequestBody();
+        BufferedReader bufferedInputStream = new BufferedReader(new InputStreamReader(inputStream));
+        String stringifiedInput = stringifyInput(bufferedInputStream);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String,Object> inputMap = mapper.readValue(stringifiedInput, Map.class);
+        String identifier = (String) inputMap.get("identifier");
+
+        int contactsDeleted = contactService.deleteContacts(identifier);
+        OutputStream outputStream = ex.getResponseBody();
+        if (contactsDeleted > 0) {
+            String successMsg = "Number of deleted contacts: %s".formatted(contactsDeleted);
+            ex.sendResponseHeaders(200, successMsg.length());
+            outputStream.write(successMsg.getBytes());
+        } else {
+            String failMeg = "There is no matching contact to delete.";
+            ex.sendResponseHeaders(404, failMeg.length());
+            outputStream.write(failMeg.getBytes());
+        }
+
+        ex.close();
     }
 
     private ContactDTO parseInput(BufferedReader bufferedReader) throws IOException {
         String stringifiedInput = stringifyInput(bufferedReader);
 
-        // turning stringifiedInput into a map
         ObjectMapper mapper = new ObjectMapper();
         Map<String,Object> inputMap = mapper.readValue(stringifiedInput, Map.class);
 
-        // mapping bodyMap into a ContactDTO
         String firstName = (String) inputMap.get("firstName");
         String lastName = (String) inputMap.get("lastName");
         String phoneNumber = (String) inputMap.get("phoneNumber");
@@ -96,9 +112,9 @@ public class ContactHandler implements HttpHandler {
         );
     }
 
-    private Map<String, String> parseQuery(String query) {
+    private HashMap<String, String> parseQuery(String query) {
         String[] params = query.split("&");
-        Map<String, String> paramsMap = new HashMap();
+        HashMap<String, String> paramsMap = new HashMap();
 
         for (String param : params) {
             String[] entry = param.split("=");
@@ -117,8 +133,6 @@ public class ContactHandler implements HttpHandler {
             if (stringifiedBody.length() > 0) stringifiedBody.append(newLineSeparator);
             stringifiedBody.append(currentLine);
         }
-
-        bufferedBodyReader.close();
 
         return stringifiedBody.toString();
     }

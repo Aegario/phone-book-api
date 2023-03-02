@@ -17,4 +17,8 @@ public class ContactService {
         Contact contact = contactDAO.get(id);
         return contactDTOMapper.toDto(contact);
     }
+
+    public int deleteContacts(String identifier) {
+        return contactDAO.delete(identifier);
+    }
 }

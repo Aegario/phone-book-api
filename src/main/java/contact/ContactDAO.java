@@ -58,9 +58,9 @@ public class ContactDAO {
 
     /**
      * Deletes contacts by identifier value
-     * @param value accepts first name, last name, full name and phone number.
+     * @param identifier accepts first name, last name, full name and phone number.
      */
-    public void delete(String value) {
+    public int delete(String identifier) {
         try {
             PreparedStatement deleteStatement = conn.prepareStatement(
                 "delete from contact " +
@@ -70,13 +70,14 @@ public class ContactDAO {
                         "or phone_number = ?"
             );
 
-            deleteStatement.setString(1, value);
-            deleteStatement.setString(2, value);
-            deleteStatement.setString(3, value);
-            deleteStatement.setString(4, value);
+            deleteStatement.setString(1, identifier);
+            deleteStatement.setString(2, identifier);
+            deleteStatement.setString(3, identifier);
+            deleteStatement.setString(4, identifier);
 
             int rowsDeleted = deleteStatement.executeUpdate();
             System.out.println("Number of deleted rows: " + rowsDeleted);
+            return rowsDeleted;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
