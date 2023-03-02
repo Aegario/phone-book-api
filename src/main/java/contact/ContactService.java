@@ -18,6 +18,10 @@ public class ContactService {
         return contactDTOMapper.toDto(contact);
     }
 
+    public void patchContact(ContactDTO contactDTO) {
+        contactDAO.patch(contactDTO);
+    }
+
     public int deleteContacts(String identifier) {
         return contactDAO.delete(identifier);
     }

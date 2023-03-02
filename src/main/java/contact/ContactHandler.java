@@ -11,6 +11,7 @@ import com.sun.net.httpserver.HttpHandler;
 public class ContactHandler implements HttpHandler {
     ContactService contactService;
 
+
     public ContactHandler(ContactService contactService) {
         this.contactService = contactService;
     }
@@ -36,8 +37,21 @@ public class ContactHandler implements HttpHandler {
         }
     }
 
+    private void createContact(HttpExchange ex) throws IOException {
+        InputStream inputStream = ex.getRequestBody();
+        BufferedReader bufferedInputReader = new BufferedReader(new InputStreamReader(inputStream));
+        ContactDTO contactDTO = ContactUtil.parseInput(bufferedInputReader);
+        contactService.createContact(contactDTO);
+
+        OutputStream outputStream = ex.getResponseBody();
+        String successMsg = "Contact has been created.";
+        ex.sendResponseHeaders(201, successMsg.length());
+        outputStream.write(successMsg.getBytes());
+        ex.close();
+    }
+
     private void getContact(HttpExchange ex) throws IOException {
-        HashMap<String, String> paramsMap = parseQuery(ex.getRequestURI().getQuery());
+        HashMap<String, String> paramsMap = ContactUtil.parseQuery(ex.getRequestURI().getQuery());
         int id = Integer.parseInt(paramsMap.get("id"));
         ContactDTO contactDTO = contactService.getContact(id);
 
@@ -50,29 +64,20 @@ public class ContactHandler implements HttpHandler {
         ex.close();
     }
 
-    private void createContact(HttpExchange ex) throws IOException {
-        InputStream inputStream = ex.getRequestBody();
-        BufferedReader bufferedInputReader = new BufferedReader(new InputStreamReader(inputStream));
-        ContactDTO contactDTO = parseInput(bufferedInputReader);
-        contactService.createContact(contactDTO);
-
-        OutputStream outputStream = ex.getResponseBody();
-        String successMsg = "Contact has been created.";
-        ex.sendResponseHeaders(201, successMsg.length());
-        outputStream.write(successMsg.getBytes());
-        ex.close();
-    }
-
     private void patchContact(HttpExchange ex) throws IOException {
         InputStream inputStream = ex.getRequestBody();
         BufferedReader bufferedInputReader = new BufferedReader(new InputStreamReader(inputStream));
-        ContactDTO contactDTO = parseInput(bufferedInputReader);
+        ContactDTO contactDTO = ContactUtil.parseInput(bufferedInputReader);
+
+        contactService.patchContact(contactDTO);
+
+        ex.close();
     }
 
     private void deleteContacts(HttpExchange ex) throws IOException {
         InputStream inputStream = ex.getRequestBody();
         BufferedReader bufferedInputStream = new BufferedReader(new InputStreamReader(inputStream));
-        String stringifiedInput = stringifyInput(bufferedInputStream);
+        String stringifiedInput = ContactUtil.stringifyInput(bufferedInputStream);
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String,Object> inputMap = mapper.readValue(stringifiedInput, Map.class);
@@ -91,49 +96,5 @@ public class ContactHandler implements HttpHandler {
         }
 
         ex.close();
-    }
-
-    private ContactDTO parseInput(BufferedReader bufferedReader) throws IOException {
-        String stringifiedInput = stringifyInput(bufferedReader);
-
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String,Object> inputMap = mapper.readValue(stringifiedInput, Map.class);
-
-        String firstName = (String) inputMap.get("firstName");
-        String lastName = (String) inputMap.get("lastName");
-        String phoneNumber = (String) inputMap.get("phoneNumber");
-        String birthdate = (String) inputMap.get("birthdate");
-
-        return new ContactDTO(
-            firstName,
-            lastName,
-            phoneNumber,
-            birthdate
-        );
-    }
-
-    private HashMap<String, String> parseQuery(String query) {
-        String[] params = query.split("&");
-        HashMap<String, String> paramsMap = new HashMap();
-
-        for (String param : params) {
-            String[] entry = param.split("=");
-            paramsMap.put(entry[0], entry[1]);
-        }
-
-        return paramsMap;
-    }
-
-    private String stringifyInput(BufferedReader bufferedBodyReader) throws IOException {
-        String newLineSeparator = System.getProperty("line.separator");
-
-        StringBuilder stringifiedBody = new StringBuilder();
-        String currentLine;
-        while ((currentLine = bufferedBodyReader.readLine()) != null) {
-            if (stringifiedBody.length() > 0) stringifiedBody.append(newLineSeparator);
-            stringifiedBody.append(currentLine);
-        }
-
-        return stringifiedBody.toString();
     }
 }

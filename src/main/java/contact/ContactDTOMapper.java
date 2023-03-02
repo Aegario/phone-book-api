@@ -14,6 +14,7 @@ public class ContactDTOMapper {
 
     public ContactDTO toDto(Contact contact) {
         return new ContactDTO(
+            contact.getId(),
             contact.getFirstName(),
             contact.getLastName(),
             contact.getPhoneNumber(),

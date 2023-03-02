@@ -102,6 +102,11 @@ public class ContactDAO {
         }
     }
 
+    public void patch(ContactDTO contactDTO) {
+        // check if id is present
+        System.out.println(contactDTO);
+    }
+
     /**
      * Updates phoneNumber of the contact with a given id
      * @param id contact's id
